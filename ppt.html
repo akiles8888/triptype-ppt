@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Triptype – Investor Deck (Simple + Screens)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --accent-strong: #0ea5e9;
+      --text-main: #e5e7eb;
+      --text-muted: #94a3b8;
+      --border-subtle: rgba(148, 163, 184, 0.35);
+    }
+    body {
+      margin: 0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: radial-gradient(circle at top left,#0f172a 0,#020617 45%);
+      color: var(--text-main);
+      overflow: hidden;
+    }
+    #deck-root { width: 100vw; height: 100vh; display:flex; flex-direction:column; }
+    .slides-wrapper { flex:1; position:relative; overflow:hidden; }
+    .slide {
+      position:absolute; inset:0;
+      padding:54px 72px 80px;
+      display:none;
+      flex-direction:column;
+      justify-content:space-between;
+      background:
+        radial-gradient(circle at top left,rgba(56,189,248,0.17),transparent 45%),
+        radial-gradient(circle at bottom right,#020617,#020617);
+    }
+    .slide.active { display:flex; animation:fadeIn 0.28s ease-out; }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateX(8px); }
+      to { opacity:1; transform:translateX(0); }
+    }
+    .slide-header { margin-bottom:28px; }
+    .eyebrow {
+      font-size:13px; letter-spacing:0.22em; text-transform:uppercase;
+      color:var(--accent); margin-bottom:8px;
+    }
+    h1,h2 { font-weight:700; letter-spacing:-0.04em; }
+    h1 { font-size:44px; line-height:1.06; margin-bottom:10px; }
+    h2 { font-size:32px; line-height:1.16; margin-bottom:8px; }
+    .subtitle-lg { font-size:18px; color:var(--text-muted); max-width:700px; }
+    .subtitle-md { font-size:16px; color:var(--text-muted); max-width:720px; }
+    .pill-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+    .pill {
+      font-size:12px; padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border-subtle);
+      background:rgba(15,23,42,0.9); color:var(--text-muted);
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .pill-dot { width:6px; height:6px; border-radius:999px; background:var(--accent); }
+    .pill-strong {
+      border-color:rgba(56,189,248,0.7);
+      background:var(--accent-soft);
+      color:var(--accent-strong);
+    }
+    .slide-main {
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr);
+      gap:36px; align-items:flex-start;
+    }
+    .slide-main.single-column { display:block; max-width:960px; }
+    .card {
+      border-radius:24px;
+      border:1px solid var(--border-subtle);
+      background:
+        radial-gradient(circle at top,rgba(15,23,42,0.96),rgba(15,23,42,0.9)),
+        #020617;
+      padding:20px 22px;
+      box-shadow:0 18px 45px rgba(15,23,42,0.88);
+    }
+    .card-soft {
+      border-radius:22px;
+      border:1px dashed rgba(148,163,184,0.45);
+      background:
+        radial-gradient(circle at top left,rgba(15,23,42,0.96),rgba(15,23,42,0.9)),
+        #020617;
+      padding:18px 20px;
+    }
+    .card-title {
+      font-size:14px; letter-spacing:0.16em; text-transform:uppercase;
+      color:var(--text-muted); margin-bottom:8px;
+    }
+    ul.bullets { list-style:none; margin-top:4px; }
+    ul.bullets li {
+      position:relative; padding-left:14px; margin-top:7px;
+      font-size:15px; color:var(--text-main);
+    }
+    ul.bullets li::before {
+      content:"•"; position:absolute; left:0; top:0;
+      color:var(--accent); opacity:0.85;
+    }
+    .badge-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .badge {
+      font-size:11px; padding:4px 10px; border-radius:999px;
+      background:rgba(15,23,42,0.92);
+      border:1px solid rgba(148,163,184,0.6);
+      color:var(--text-muted);
+    }
+    .badge-strong { border-color:rgba(56,189,248,0.8); color:var(--accent-strong); }
+    .metric-big { font-size:30px; font-weight:640; margin-bottom:4px; }
+    .metric-caption { font-size:13px; color:var(--text-muted); }
+    .kpi-grid {
+      display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px; margin-top:10px;
+    }
+    .kpi {
+      border-radius:18px; border:1px solid rgba(51,65,85,0.9);
+      padding:9px 11px;
+      background:radial-gradient(circle at top left,rgba(15,23,42,1),rgba(15,23,42,0.94));
+    }
+    .kpi-label {
+      font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+      color:var(--text-muted); margin-bottom:3px;
+    }
+    .kpi-value { font-size:18px; font-weight:600; margin-bottom:1px; }
+    .kpi-note { font-size:11px; color:var(--text-muted); }
+    .footer-notes { font-size:11px; color:var(--text-muted); margin-top:12px; }
+    .footer-notes strong { color:var(--accent-strong); }
+
+    /* 이미지 그리드 */
+    .screen-grid {
+      display:grid;
+      grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);
+      gap:18px;
+    }
+    .screen-col { display:flex; flex-direction:column; gap:18px; }
+    .screen-img-wrap {
+      border-radius:20px;
+      border:1px solid rgba(148,163,184,0.4);
+      overflow:hidden;
+      background:#020617;
+      box-shadow:0 14px 32px rgba(15,23,42,0.85);
+    }
+    .screen-img-wrap img {
+      display:block;
+      width:100%;
+      height:auto;
+    }
+    .screen-caption {
+      font-size:12px;
+      color:var(--text-muted);
+      padding:8px 12px 10px;
+      border-top:1px solid rgba(30,64,175,0.45);
+      background:linear-gradient(to bottom,rgba(15,23,42,0.96),rgba(15,23,42,0.94));
+    }
+
+    .controls-bar {
+      height:62px;
+      border-top:1px solid rgba(30,64,175,0.55);
+      backdrop-filter:blur(14px);
+      background:linear-gradient(to top,rgba(15,23,42,0.96),rgba(15,23,42,0.9));
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 22px;
+      font-size:13px; color:var(--text-muted);
+    }
+    .control-left,.control-right { display:flex; align-items:center; gap:14px; }
+    .btn {
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      background:rgba(15,23,42,0.96);
+      padding:6px 14px;
+      font-size:13px; color:var(--text-main);
+      display:inline-flex; align-items:center; gap:6px;
+      cursor:pointer; transition:all 0.15s ease-out;
+    }
+    .btn-primary {
+      border-color:rgba(56,189,248,0.9);
+      background:radial-gradient(circle at top,rgba(56,189,248,0.16),rgba(15,23,42,0.98));
+    }
+    .btn:disabled { opacity:0.35; cursor:default; }
+    .btn:not(:disabled):hover {
+      transform:translateY(-1px);
+      box-shadow:0 6px 18px rgba(15,23,42,0.9);
+    }
+    .slide-indicator { font-feature-settings:"tnum" 1,"lnum" 1; }
+    .dots { display:flex; gap:6px; align-items:center; }
+    .dot { width:6px; height:6px; border-radius:999px; background:rgba(51,65,85,0.9); }
+    .dot.active { width:18px; background:var(--accent-strong); }
+
+    @media (max-width:900px) {
+      .slide { padding:30px 16px 80px; }
+      .slide-main { grid-template-columns:minmax(0,1fr); }
+      .screen-grid { grid-template-columns:minmax(0,1fr); }
+      h1 { font-size:30px; }
+      h2 { font-size:24px; }
+      .subtitle-lg,.subtitle-md { font-size:14px; }
+      .controls-bar { padding:0 12px; }
+      .control-left span.hide-sm { display:none; }
+    }
+    .screen-img-wrap img,
+    .screen-img-wrap video {
+    display: block;
+    width: 100%;
+    height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="deck-root">
+    <div class="slides-wrapper">
+      <!-- SLIDE 1: TITLE -->
+      <section class="slide active">
+        <header class="slide-header">
+          <div class="eyebrow">TRIPTYPE · AI TRAVEL PLANNER</div>
+          <h1>나를 닮은 여행을<br>3분 안에 뽑아주는 서비스</h1>
+          <p class="subtitle-lg">
+            Triptype은 성격과 여행 취향을 분석해<br>
+            <strong>“나에게 딱 맞는 여행 일정 초안”</strong>을 자동으로 만들어주는 서비스입니다.
+          </p>
+          <div class="pill-row">
+            <div class="pill pill-strong">
+              <span class="pill-dot"></span>
+              성격 기반 맞춤 여행 일정
+            </div>
+            <div class="pill">AI가 코스와 동선을 함께 제안</div>
+            <div class="pill">지도와 숙소를 한 화면에서 확인</div>
+            <div class="pill">웹에서 바로 사용 가능한 SaaS</div>
+          </div>
+        </header>
+        <div class="slide-main single-column">
+          <div class="card">
+            <div class="card-title">한 줄 요약</div>
+            <div class="metric-big">
+              “수십 개 글을 뒤지던 여행 준비를<br>하나의 질문–답 과정으로 줄인다”
+            </div>
+            <p class="metric-caption">
+              기존에는 블로그·유튜브·후기들을 직접 조합해야 했다면,<br>
+              Triptype은 사용자의 성향과 일정만 입력하면 AI가 알아서
+              <strong>여행 초안을 설계</strong>해 줍니다.
+            </p>
+          </div>
+        </div>
+        <div class="footer-notes">
+          이미 서비스의 대부분 기능이 구현된 상태이며, 현재는
+          <strong>초기 사용자·투자자와 함께 시장 검증 단계로 나아갈 준비</strong>를 마쳤습니다.
+        </div>
+      </section>
+
+      <!-- SLIDE 2: PROBLEM -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">01 · 문제</div>
+          <h2>여행 준비, 아직도 “검색 지옥”에서 벗어나지 못했습니다</h2>
+          <p class="subtitle-md">
+            예약은 버튼 한 번으로 끝나지만,<br>
+            <strong>“어디를 어떤 순서로 돌지”를 정하는 일</strong>은 여전히 개인에게 남겨져 있습니다.
+          </p>
+        </header>
+        <div class="slide-main">
+            <div class="screen-img-wrap">
+                <video
+                  src="triptype-demo.mp4"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  controls
+                ></video>
+                <div class="screen-caption">
+                  Triptype 데모 영상 – 사용자가 정보를 입력하고
+                  일정이 생성되는 전 과정을 1분 내로 보여주는 하이라이트 클립입니다.
+                </div>
+              </div>
+              
+          <div class="card">
+            <div class="card-title">여행자에게 익숙한 현실</div>
+            <ul class="bullets">
+              <li>블로그, 유튜브, 숏폼, 인스타를 오가며 <strong>하루 종일 검색</strong></li>
+              <li>남이 다녀온 “베스트 코스”를 복사해 쓰지만, <strong>내 취향과는 어딘가 어긋남</strong></li>
+              <li>동선, 이동시간, 체력, 동행자 스타일까지 고려하면 <strong>기획자 수준의 부담</strong></li>
+              <li>결국 “대충 이 정도면 되겠지” 하고 떠났다가,<br>돌아와서 <strong>20–30%는 아쉬움과 후회</strong>로 남음</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">기존 예약 플랫폼의 한계</div>
+            <ul class="bullets">
+              <li>Trip.com, Booking, Agoda 등은 <strong>“빠른 예약”에는 최적화</strong></li>
+              <li>하지만 “나라는 사람”을 이해하고 <strong>여행 동선을 설계</strong>해 주지는 못함</li>
+              <li>결국 가장 힘든 단계인 <strong>“여행 기획”은 여전히 개인의 몫</strong>으로 남아 있음</li>
+            </ul>
+            <div class="badge-row">
+              <div class="badge">예약 레이어는 포화 상태</div>
+              <div class="badge badge-strong">“기획 레이어”는 아직 비어 있음</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: SOLUTION OVERVIEW -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">02 · 해결책</div>
+          <h2>Triptype: 성격과 취향을 이해하는 여행 플래너</h2>
+          <p class="subtitle-md">
+            Triptype은 단순히 “가볼 만한 곳”을 추천하는 것이 아니라,<br>
+            <strong>“나에게 어울리는 하루의 흐름”</strong>을 설계합니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="card">
+            <div class="card-title">어떻게 작동하나요?</div>
+            <ul class="bullets">
+              <li>간단한 질문으로 <strong>성격과 여행 스타일을 파악</strong>합니다.</li>
+              <li>가고 싶은 도시, 날짜, 예산, 동행자를 입력하면,</li>
+              <li>AI가 <strong>하루 최소 6개 이상의 활동</strong>이 들어간 일정 초안을 만들어 줍니다.</li>
+              <li>각 일정은 지도·동선과 함께 보여 주어<br><strong>“실제로 가능한 계획인지”</strong>를 직관적으로 확인할 수 있습니다.</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">사용자가 얻는 가치</div>
+            <ul class="bullets">
+              <li>수십 시간 걸리던 여행 준비를 <strong>몇 분으로 단축</strong></li>
+              <li>내 성향에 맞는 여행이라 <strong>여행 만족도가 높아짐</strong></li>
+              <li>동행자와 미리 일정을 공유하고, <strong>쉽게 수정·조율</strong> 가능</li>
+              <li>여행 전 “잘 짠 것 같다”에서 끝나지 않고,<br><strong>다녀와서도 후회가 적은 여행</strong>을 돕는 도구</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: USER EXPERIENCE -->
+     
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">03 · 사용자 경험</div>
+          <h2>Triptype 한 화면으로 보는 “나만의 여행 보드”</h2>
+          <p class="subtitle-md">
+            Triptype의 결과 화면은 단순한 리스트가 아니라,<br>
+            <strong>여행 전체를 한눈에 보는 보드(Trip Board)</strong>입니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="card">
+            <div class="card-title">Trip Board 구성</div>
+            <ul class="bullets">
+              <li>왼쪽: 이번 여행의 <strong>전체 개요와 테마</strong></li>
+              <li>가운데: 날짜별로 나뉜 <strong>시간대별 일정 카드</strong> (카페, 맛집, 명소 등)</li>
+              <li>오른쪽: 실제 지도를 기반으로 한 <strong>동선·위치 정보</strong></li>
+              <li>“오늘 하루의 흐름”과 “여행 전체 흐름”을 동시에 보는 구조</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">예시 상황</div>
+            <ul class="bullets">
+              <li>“사람 많은 곳 싫어하는 내향적인 여행자”에게는<br>
+                  조용한 카페·전시·산책 코스 중심으로 제안</li>
+              <li>“에너지가 넘치는 커플 여행”이라면<br>
+                  액티비티·야경·바 등을 섞어 리듬을 설계</li>
+              <li>“아이 동반 가족 여행”이라면<br>
+                  이동 거리를 줄이고 휴식 위주의 일정 구성</li>
+            </ul>
+            <div class="badge-row">
+              <div class="badge badge-strong">동일한 도시라도 사람마다 전혀 다른 여정</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: PRODUCT SCREENS 1 -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">04 · Product Screens</div>
+          <h2>온보딩과 “빠른 추천 / 상세 맞춤” 화면</h2>
+          <p class="subtitle-md">
+            실제 서비스가 어떻게 보이는지, 초기 여정의 주요 화면을 한 번에 보여줍니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="screen-grid">
+            <div class="screen-col">
+              <div class="screen-img-wrap">
+                <img src="triptype-landing.png" alt="Triptype 랜딩 페이지" />
+                <div class="screen-caption">
+                  첫 화면 – “당신만을 위한 AI 여행 설계”.<br>
+                  사용자는 목적지와 성향 정보를 간단히 입력하고 시작합니다.
+                </div>
+              </div>
+            </div>
+            <div class="screen-col">
+              <div class="screen-img-wrap">
+                <img src="triptype-quick-plan.png" alt="빠른 추천 화면" />
+                <div class="screen-caption">
+                  빠른 추천(Quick Plan) – 최소 정보만으로 빠르게 일정 초안을 생성합니다.
+                </div>
+              </div>
+              <div class="screen-img-wrap">
+                <img src="triptype-detailed-plan.png" alt="상세 맞춤 화면" />
+                <div class="screen-caption">
+                  상세 맞춤(Detailed Plan) – 출발지, 예산, 여행 스타일 등을 세밀하게 입력해
+                  더 정교한 일정을 만들 수 있습니다.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: PRODUCT SCREENS 2 -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">05 · Product Screens</div>
+          <h2>성향 입력 · 제휴 숙소 · 최종 여행 보드</h2>
+          <p class="subtitle-md">
+            사용자의 성향을 반영하고, 실제 숙소와 연결되며, 마지막에는 완성된 여행 보드를 제공합니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="screen-grid">
+            <div class="screen-col">
+              <div class="screen-img-wrap">
+                <img src="triptype-style.png" alt="여행자 스타일 입력" />
+                <div class="screen-caption">
+                  여행자 스타일 & 성향 정보 – 누구와, 어떤 목적의 여행인지,
+                  MBTI·에니어그램·별자리까지 선택적으로 입력할 수 있습니다.
+                </div>
+              </div>
+              <div class="screen-img-wrap">
+                <img src="triptype-theme.png" alt="여행 테마 선택" />
+                <div class="screen-caption">
+                  여행 테마와 분위기 – 힐링, 맛집, 감성적인 도시 등 사용자가 원하는 분위기를 선택합니다.
+                </div>
+              </div>
+            </div>
+            <div class="screen-col">
+              <div class="screen-img-wrap">
+                <img src="triptype-hotel-modal.png" alt="숙소 추천 모달" />
+                <div class="screen-caption">
+                  제휴 숙소 추천 – Agoda와 연동된 호텔·리조트 추천을 한 번에 확인하고 예약 페이지로 이동합니다.
+                </div>
+              </div>
+              <div class="screen-img-wrap">
+                <img src="triptype-tripboard.png" alt="최종 Trip Board 화면" />
+                <div class="screen-caption">
+                  최종 Trip Board – 왼쪽에는 여행 개요와 핫한 숙소, 가운데에는 일자별 일정, 오른쪽에는 실제 지도 동선이 표시됩니다.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: EXAMPLE USER STORIES -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">06 · 예시 시나리오</div>
+          <h2>Triptype이 만들어 줄 수 있는 실제 장면들</h2>
+          <p class="subtitle-md">
+            “이 서비스가 있으면, 실제로 어떤 순간들이 바뀔까?”에 집중한 예입니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="card">
+            <div class="card-title">케이스 1 · 바쁜 직장인 커플</div>
+            <ul class="bullets">
+              <li>주말에 부산 1박 2일 여행을 가려 하지만,<br>서로 야근으로 준비할 시간이 없음</li>
+              <li>Triptype에 두 사람 성향과 예산만 입력</li>
+              <li>“낮에는 바다, 저녁에는 조용한 술자리” 스타일에 맞는<br>
+                  <strong>1박 2일 동선·맛집·카페가 자동 생성</strong></li>
+              <li>출발 전날, 서로 카톡으로 Trip Board를 공유하며<br>
+                  약간만 수정하고 바로 확정</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">케이스 2 · 첫 해외여행을 떠나는 20대</div>
+            <ul class="bullets">
+              <li>처음 가보는 도시에 겁이 나서,<br>일정을 어떻게 짜야 할지 감이 안 옴</li>
+              <li>“혼자여행 · 카페 좋아함 · 밤 늦게까지 돌아다니는 편 아님”을 입력</li>
+              <li>안전하고 분위기 좋은 동네 위주로 코스가 짜이고,<br>
+                  <strong>하루의 에너지 흐름까지 고려된 일정</strong>이 완료</li>
+              <li>여행 후, Trip Board를 저장해 두고<br>다음 여행의 기준으로 다시 활용</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: MARKET & POSITIONING -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">07 · 시장과 위치</div>
+          <h2>Trip.com은 “예약”, Triptype은 “기획”을 책임진다</h2>
+          <p class="subtitle-md">
+            우리는 기존 거대 예약 플랫폼과 경쟁하기보다,<br>
+            <strong>그 위에 올라가는 “기획 레이어”</strong>를 지향합니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="card">
+            <div class="card-title">시장의 흐름</div>
+            <ul class="bullets">
+              <li>항공·숙소 예약 시장은 이미 <strong>전 세계 플레이어로 포화</strong></li>
+              <li>하지만, “내가 어떤 여행을 하고 싶은지”를 설계해 주는<br>
+                  <strong>도구·서비스는 아직 초기에 불과</strong></li>
+              <li>MBTI, 연애·성향 콘텐츠 붐은<br>
+                  “나는 어떤 사람인가”에 대한 관심이 매우 높다는 신호</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">Triptype 포지셔닝</div>
+            <ul class="bullets">
+              <li>“Trip.com이 3분 안에 예약을 끝낸다면,</li>
+              <li>Triptype은 3분 안에 <strong>‘나다운 여행 초안’을 만들어 준다</strong>”</li>
+              <li>예약은 기존 플랫폼을 그대로 활용하면서,<br>
+                  Triptype은 그 앞단의 <strong>기획과 추천을 담당</strong></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: BUSINESS MODEL -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">08 · 수익 모델</div>
+          <h2>한 번 쓰고 끝이 아니라, 계속 돌아오는 구조</h2>
+          <p class="subtitle-md">
+            Triptype은 여행 한 번에 그치지 않고,<br>
+            <strong>여러 번의 여행과 여러 종류의 수익</strong>이 나올 수 있는 구조를 지향합니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="card">
+            <div class="card-title">핵심 수익원</div>
+            <ul class="bullets">
+              <li><strong>제휴(어필리에이트) 수수료</strong><br>
+                  · Triptype에서 만든 일정 속 숙소·티켓을 클릭해 예약할 때 발생하는 커미션</li>
+              <li><strong>프리미엄 구독/결제</strong><br>
+                  · 더 많은 일정 저장, 고급 여행지 분석, PDF/노션 내보내기 등</li>
+              <li><strong>브랜드·로컬 파트너십</strong><br>
+                  · 로컬 투어, 액티비티, 레스토랑 등의 노출·추천 패키지</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">경제성 방향성</div>
+            <ul class="bullets">
+              <li>AI 비용은 경량화된 구조를 통해 <strong>여행 1회당 비용을 낮게 유지</strong></li>
+              <li>Trip Board는 한번 만들어 두면,<br>
+                  재여행·친구 공유·수정 등으로 <strong>여러 번 쓰일 수 있는 자산</strong></li>
+              <li>사용자가 여러 도시, 여러 시즌에 반복 방문할수록<br>
+                  자연스럽게 <strong>LTV가 커지는 구조</strong></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: PRODUCT STATUS & TRACTION -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">09 · 진행 상황</div>
+          <h2>이미 “아이디어 단계”를 넘어, 서비스 골격은 완성</h2>
+          <p class="subtitle-md">
+            Triptype은 지금 이 순간에도 돌아갈 수 있는 수준까지 개발이 진행되어 있습니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="card">
+            <div class="card-title">현재 상태 (요약)</div>
+            <div class="kpi-grid">
+              <div class="kpi">
+                <div class="kpi-label">서비스 완성도</div>
+                <div class="kpi-value">약 40%</div>
+                <div class="kpi-note">핵심 기능 개발 완료</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">핵심 기능</div>
+                <div class="kpi-value">구현 완료</div>
+                <div class="kpi-note">회원·여행 생성·일정 보기</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-label">제휴 인프라</div>
+                <div class="kpi-value">준비됨</div>
+                <div class="kpi-note">호텔·도시 데이터 정교화</div>
+              </div>
+            </div>
+            <ul class="bullets">
+              <li>실제 웹 서비스 형태로 동작 가능</li>
+              <li>여행 일정 생성, 지도 연동, 호텔 데이터 연결 등 이미 구현</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">이 단계에서의 투자 의미</div>
+            <ul class="bullets">
+              <li>아이디어 검증이 아니라 <strong>실제 제품을 시장에 내보내는 단계</strong>에 함께하는 투자</li>
+              <li>앞으로의 자금은 “개발”보다는<br>
+                  <strong>사용자 확보, 시장 테스트, 파트너십 확대</strong>에 쓰일 계획</li>
+              <li>초기에 합류한 투자자는,<br>
+                  제품 방향과 전략 수립 과정에서 <strong>실질적인 파트너 역할</strong>을 할 수 있음</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: ROADMAP & ASK -->
+      <section class="slide">
+        <header class="slide-header">
+          <div class="eyebrow">10 · 로드맵 & 제안</div>
+          <h2>“여행 기획”이라는 마지막 공백을 함께 채워 나갈 파트너</h2>
+          <p class="subtitle-md">
+            이제 Triptype은 <strong>시장과 사용자의 목소리를 본격적으로 들을 준비</strong>가 되어 있습니다.
+          </p>
+        </header>
+        <div class="slide-main">
+          <div class="card">
+            <div class="card-title">향후 6개월 로드맵</div>
+            <ul class="bullets">
+              <li>국내 중심 클로즈드 베타 런칭 · 초기 사용자 피드백 수집</li>
+              <li>여러 도시·여러 유형의 여행 데이터를 쌓아<br>
+                  추천 품질을 계속 개선</li>
+              <li>파트너(여행사·로컬 사업자·콘텐츠 플랫폼)와의 파일럿 진행</li>
+              <li>서비스 안정화 후, 다국어 지원 및 해외 타겟 테스트</li>
+            </ul>
+          </div>
+          <div class="card-soft">
+            <div class="card-title">투자 제안</div>
+            <ul class="bullets">
+              <li>현재 단계: Seed / Pre-Seed 사이 구간으로, 금액·구조는 협의 가능</li>
+              <li>여행, 콘텐츠, 플랫폼 비즈니스와의 <strong>전략적 시너지</strong>를 우선 고려</li>
+              <li>단기 실적보다, <strong>사용자 경험과 장기적인 여행 데이터 자산</strong>에 함께 투자하실 파트너를 찾고 있습니다.</li>
+            </ul>
+            <div class="badge-row">
+              <div class="badge badge-strong">“여행 예약”이 아니라 “여행 기획”을 선점하는 기회</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="controls-bar">
+      <div class="control-left">
+        <span class="hide-sm">← → 방향키로 슬라이드 전환</span>
+        <div class="dots" id="dots"></div>
+      </div>
+      <div class="control-right">
+        <span class="slide-indicator" id="indicator"></span>
+        <button class="btn" id="prevBtn">◀ Prev</button>
+        <button class="btn btn-primary" id="nextBtn">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const total = slides.length;
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const indicator = document.getElementById("indicator");
+      const dotsContainer = document.getElementById("dots");
+
+      let index = 0;
+
+      slides.forEach((_, i) => {
+        const dot = document.createElement("div");
+        dot.className = "dot" + (i === 0 ? " active" : "");
+        dot.dataset.index = String(i);
+        dot.addEventListener("click", () => goTo(i));
+        dotsContainer.appendChild(dot);
+      });
+
+      const dots = Array.from(document.querySelectorAll(".dot"));
+
+      function update() {
+        slides.forEach((s, i) => s.classList.toggle("active", i === index));
+        dots.forEach((d, i) => d.classList.toggle("active", i === index));
+        indicator.textContent = `${index + 1} / ${total}`;
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === total - 1;
+      }
+
+      function goTo(i) {
+        if (i < 0 || i >= total) return;
+        index = i;
+        update();
+      }
+
+      function next() {
+        if (index < total - 1) {
+          index++;
+          update();
+        }
+      }
+
+      function prev() {
+        if (index > 0) {
+          index--;
+          update();
+        }
+      }
+
+      nextBtn.addEventListener("click", next);
+      prevBtn.addEventListener("click", prev);
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === "PageDown") next();
+        else if (e.key === "ArrowLeft" || e.key === "PageUp") prev();
+      });
+
+      update();
+    })();
+  </script>
+</body>
+</html>
